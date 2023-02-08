@@ -1,5 +1,7 @@
+/* eslint-disable no-console */
 import { SiweMessage } from 'siwe';
 import { ethers } from 'ethers';
+import jwtDecode from 'jwt-decode';
 
 const $connectWalletBtn = document.querySelector('#connect-wallet-btn');
 const $siweBtn = document.querySelector('#siwe-btn');
@@ -16,7 +18,24 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
 async function createSiweMessage(address, statement) {
+  // fetch('/nonce')
+  //   .then(res => res.json())
+  //   .then(token => {
+
+  //   })
+  //   .catch(err => console.error(err.message));
+
   const res = await fetch('/nonce');
+  let token = await res.json();
+
+  console.log('res:', token);
+
+  window.localStorage.setItem('auth-jwt', token);
+  token = window.localStorage.getItem('auth-jwt');
+  console.log('token', token);
+
+  const { nonce } = jwtDecode(token);
+  console.log('nonce', nonce);
   const message = new SiweMessage({
     domain,
     address,
@@ -24,16 +43,18 @@ async function createSiweMessage(address, statement) {
     uri: origin,
     version: '1',
     chainId: '1',
-    nonce: await res.text()
+    nonce
   });
   return message.prepareMessage();
+  // window.localStorage.setItem('auth-jwt', token);
+
 }
 
 function connectWallet() {
   provider.send('eth_requestAccounts', [])
     // eslint-disable-next-line no-console
     .then(address => console.log(address))
-    .catch(err => console.error(err));
+    .catch(err => console.error('err swagg', err));
 }
 
 let signature;
@@ -41,8 +62,13 @@ let message;
 
 async function signInWithEthereum() {
   try {
-    message = await createSiweMessage(await signer.getAddress(), 'Sign in with Ethereum to access App.');
+    const address = await signer.getAddress();
+    console.log('address');
+    message = await createSiweMessage(address, 'Sign in with Ethereum to access App.');
+    console.log('message');
     signature = await signer.signMessage(message);
+    console.log('signature', signature);
+
   } catch (err) {
     console.error(err);
   }

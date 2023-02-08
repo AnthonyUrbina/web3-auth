@@ -63,11 +63,8 @@ let message;
 async function signInWithEthereum() {
   try {
     const address = await signer.getAddress();
-    console.log('address');
     message = await createSiweMessage(address, 'Sign in with Ethereum to access App.');
-    console.log('message');
     signature = await signer.signMessage(message);
-    console.log('signature', signature);
 
   } catch (err) {
     console.error(err);
@@ -75,15 +72,21 @@ async function signInWithEthereum() {
 }
 
 async function sendForVerification() {
+  const token = window.localStorage.getItem('auth-jwt');
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Access-Token': token
+  };
+
   const res = await fetch('/verify', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
+    headers,
     body: JSON.stringify({ message, signature })
   });
   // eslint-disable-next-line no-console
-  console.log(await res.text());
+  const _token = await res.json();
+  console.log('_token', _token);
 }
 
 // console.log(createSiweMessage('0x07c233C36ac7103bDDD8fdebE9935fE871BF5474', 'Anthony wants you to sign in with your Ethereum account'));

@@ -24,16 +24,25 @@ app.get('/nonce', async (req, res) => {
 const { SiweMessage } = siwe;
 
 app.post('/verify', async (req, res) => {
+  const token = req.headers['x-access-token'];
+  const payload = jwt.verify(token, secret);
+
   const { message, signature } = req.body;
   console.log('message', message);
   const siweMessage = new SiweMessage(message);
   try {
     const fields = await siweMessage.validate(signature);
-    console.log('fields', fields);
-    res.send(true);
+
+    if (payload.nonce !== fields.nonce) {
+      res.status(400).json('invalid nonce');
+      return;
+    }
+    const _token = jwt.sign({ fields }, secret);
+    console.log('fields', fields.nonce);
+    res.status(200).json(_token);
   } catch (err) {
     console.error(err);
-    res.send(false);
+    res.status(400).json(err);
   }
 });
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const express = require('express');
 const app = express();
 const http = require('http');
@@ -8,16 +7,15 @@ const publicPath = path.join(__dirname, 'dist');
 const staticMiddleware = express.static(publicPath);
 const jwt = require('jsonwebtoken');
 const siwe = require('siwe');
-app.use(staticMiddleware);
-app.use(express.json());
-
 const secret = 'swag';
+const authorizationMiddleware = require('./authorization-middleware');
+const jsonMiddleware = express.json();
+app.use(staticMiddleware);
+app.use(jsonMiddleware);
 
 app.get('/nonce', async (req, res) => {
   const nonce = siwe.generateNonce();
-  console.log('nonce:', nonce);
   const token = jwt.sign({ nonce }, secret);
-  console.log('token', token);
   res.status(200).json(token);
 });
 
@@ -28,7 +26,6 @@ app.post('/verify', async (req, res) => {
   const payload = jwt.verify(token, secret);
 
   const { message, signature } = req.body;
-  console.log('message', message);
   const siweMessage = new SiweMessage(message);
   try {
     const fields = await siweMessage.validate(signature);
@@ -38,12 +35,17 @@ app.post('/verify', async (req, res) => {
       return;
     }
     const _token = jwt.sign({ fields }, secret);
-    console.log('fields', fields.nonce);
     res.status(200).json(_token);
   } catch (err) {
     console.error(err);
     res.status(400).json(err);
   }
+});
+
+app.use(authorizationMiddleware);
+
+app.get('/area51', (req, res) => {
+  res.status(200).json('user is authorized');
 });
 
 server.listen(3000, () => {

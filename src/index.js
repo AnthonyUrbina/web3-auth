@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { SiweMessage } from 'siwe';
 import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
@@ -6,10 +5,12 @@ import jwtDecode from 'jwt-decode';
 const $connectWalletBtn = document.querySelector('#connect-wallet-btn');
 const $siweBtn = document.querySelector('#siwe-btn');
 const $verifyBtn = document.querySelector('#verify-btn');
+const $area51Btn = document.querySelector('#area51-btn');
 
 $connectWalletBtn.addEventListener('click', connectWallet);
 $siweBtn.addEventListener('click', signInWithEthereum);
 $verifyBtn.addEventListener('click', sendForVerification);
+$area51Btn.addEventListener('click', enterArea51);
 
 const domain = window.location.host;
 const origin = window.location.origin;
@@ -18,24 +19,14 @@ const provider = new ethers.providers.Web3Provider(window.ethereum);
 const signer = provider.getSigner();
 
 async function createSiweMessage(address, statement) {
-  // fetch('/nonce')
-  //   .then(res => res.json())
-  //   .then(token => {
-
-  //   })
-  //   .catch(err => console.error(err.message));
 
   const res = await fetch('/nonce');
   let token = await res.json();
 
-  console.log('res:', token);
-
   window.localStorage.setItem('auth-jwt', token);
   token = window.localStorage.getItem('auth-jwt');
-  console.log('token', token);
 
   const { nonce } = jwtDecode(token);
-  console.log('nonce', nonce);
   const message = new SiweMessage({
     domain,
     address,
@@ -46,8 +37,6 @@ async function createSiweMessage(address, statement) {
     nonce
   });
   return message.prepareMessage();
-  // window.localStorage.setItem('auth-jwt', token);
-
 }
 
 function connectWallet() {
@@ -84,9 +73,19 @@ async function sendForVerification() {
     headers,
     body: JSON.stringify({ message, signature })
   });
-  // eslint-disable-next-line no-console
+
   const _token = await res.json();
-  console.log('_token', _token);
+  window.localStorage.setItem('siwe-jwt', _token);
 }
 
-// console.log(createSiweMessage('0x07c233C36ac7103bDDD8fdebE9935fE871BF5474', 'Anthony wants you to sign in with your Ethereum account'));
+async function enterArea51() {
+  const _token = window.localStorage.getItem('siwe-jwt');
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Access-Token': _token
+  };
+  const res = await fetch('/area51', { headers });
+  const message = await res.json();
+  // eslint-disable-next-line no-console
+  console.log(message);
+}

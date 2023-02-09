@@ -4,9 +4,16 @@
   "private": true,
   "description": "Code exercise solutions.",
   "scripts": {
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "dev": "nodemon index.js",
+    "watch": "webpack --watch --stats=minimal --mode=development --devtool=source-map",
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/plugin-transform-arrow-functions": "^7.20.7",
+    "@babel/plugin-transform-block-scoping": "^7.20.15",
     "eslint": "^8.25.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-html": "^7.1.0",
@@ -19,5 +26,16 @@
     "stylelint": "^14.14.0",
     "stylelint-config-recommended": "^9.0.0",
     "stylelint-config-standard": "^27.0.0"
+  },
+  "dependencies": {
+    "babel-loader": "^9.1.2",
+    "ethers": "^5.5.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "jwt-decode": "^3.1.2",
+    "nodemon": "^2.0.20",
+    "siwe": "^1.1.6",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }

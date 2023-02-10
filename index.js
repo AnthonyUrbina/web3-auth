@@ -21,6 +21,8 @@ app.get('/nonce', async (req, res) => {
 
 const { SiweMessage } = siwe;
 
+app.use(authorizationMiddleware);
+
 app.post('/verify', async (req, res) => {
   const token = req.headers['x-access-token'];
   const payload = jwt.verify(token, secret);
@@ -41,8 +43,6 @@ app.post('/verify', async (req, res) => {
     res.status(400).json(err);
   }
 });
-
-app.use(authorizationMiddleware);
 
 app.get('/area51', (req, res) => {
   res.status(200).json('user is authorized');

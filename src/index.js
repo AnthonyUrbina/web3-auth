@@ -3,21 +3,21 @@ import { ethers } from 'ethers';
 import jwtDecode from 'jwt-decode';
 
 const $connectWalletBtn = document.querySelector('#connect-wallet-btn');
-// const $siweBtn = document.querySelector('#siwe-btn');
-// const $verifyBtn = document.querySelector('#verify-btn');
 const $area51Btn = document.querySelector('#area51-btn');
 const $header = document.querySelector('#header');
 const $siweBtn = document.createElement('button');
 const $area51Txt = document.createElement('p');
+const $area51Img = document.createElement('img');
+
 const $area51Container = document.querySelector('.area51-container');
 
 $siweBtn.addEventListener('click', signInWithEthereum);
 $connectWalletBtn.addEventListener('click', connectWallet);
-// $verifyBtn.addEventListener('click', sendForVerification);
 $area51Btn.addEventListener('click', enterArea51);
 
 $siweBtn.textContent = 'Sign In';
 $siweBtn.id = 'siwe-btn';
+$area51Img.id = 'area51-img';
 
 const domain = window.location.host;
 const origin = window.location.origin;
@@ -63,7 +63,6 @@ function changeButton(event, address) {
 
 function connectWallet(event) {
   provider.send('eth_requestAccounts', [])
-    // eslint-disable-next-line no-console
     .then(address => {
       if (!address.error) {
         changeButton(event);
@@ -86,7 +85,6 @@ async function signInWithEthereum(event) {
   }
 }
 
-// eslint-disable-next-line no-unused-vars
 async function sendForVerification() {
   const token = window.localStorage.getItem('auth-jwt');
 
@@ -107,19 +105,25 @@ async function sendForVerification() {
 
 async function enterArea51() {
   try {
+    await sendForVerification();
     const _token = window.localStorage.getItem('siwe-jwt');
     const headers = {
       'Content-Type': 'application/json',
       'X-Access-Token': _token
     };
     const res = await fetch('/area51', { headers });
-    const message = await res.json();
+    await res.json();
 
-    // eslint-disable-next-line no-console
-    console.log(message);
+    $area51Img.src = 'alien.gif';
+    $area51Container.appendChild($area51Img);
+    $area51Txt.textContent = 'Access Granted!';
+    $area51Txt.style.color = 'green';
+    $area51Container.appendChild($area51Txt);
+    $area51Img.src = 'alien.gif';
+    $header.appendChild($area51Img);
   } catch (err) {
     console.error(err);
-    $area51Txt.textContent = 'You do not have access!';
+    $area51Txt.textContent = 'Access Denied!';
     $area51Txt.className = 'red';
     $area51Container.appendChild($area51Txt);
   }

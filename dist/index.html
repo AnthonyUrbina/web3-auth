@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
   <title>Web3 Auth</title>
 </head>
 <body>
-  <button style="cursor: pointer" id="connect-wallet-btn">Connect Wallet</button>
-  <button style="cursor: pointer" id="siwe-btn">Sign in With Eth</button>
-  <button style="cursor: pointer" id="verify-btn">Verify</button>
-  <button style="cursor: pointer" id="area51-btn">Enter Area 51</button>
+  <div id="header">
+    <button style="cursor: pointer" class="" id="connect-wallet-btn">Connect Wallet</button>
+    <!-- <button style="cursor: pointer" id="verify-btn">Verify</button> -->
+    <div class="area51-container">
+      <button id="area51-btn">Enter Area 51</button>
+    </div>
+  </div>
   <script src="main.js"></script>
 </body>
 </html>
